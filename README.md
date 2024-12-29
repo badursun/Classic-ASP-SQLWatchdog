@@ -1,5 +1,7 @@
 # Classic ASP SQLWatchdog
 
+![Classic ASP SQLWatchdog - SQL Query Performance Monitor](docs/images/cover.webp)
+
 A lightweight SQL query performance monitoring and profiling tool designed specifically for Classic ASP applications. SQLWatchdog helps developers identify slow queries, monitor SQL performance, and optimize database operations with minimal setup and overhead.
 
 ## Features
