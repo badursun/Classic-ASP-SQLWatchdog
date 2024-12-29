@@ -4,47 +4,25 @@ A lightweight SQL query performance monitoring and profiling tool designed speci
 
 ## How It Works
 
-```mermaid
-sequenceDiagram
-    participant App as Classic ASP App
-    participant SW as SQLWatchdog
-    participant DB as Database
-    participant Log as Query Logs
+### Workflow
+![SQLWatchdog Workflow](docs/images/workflow.svg)
 
-    Note over App,Log: Initialization Phase
-    App->>SW: Create Connection
-    SW->>DB: Store Original Connection
-    SW->>SW: Set Threshold (300ms)
+The diagram above shows how SQLWatchdog intercepts and monitors database operations:
+1. Your ASP application sends a query
+2. SQLWatchdog intercepts and starts timing
+3. Query is forwarded to the database
+4. Results are captured and analyzed
+5. Performance metrics are logged
 
-    Note over App,Log: Query Execution
-    App->>SW: Execute("SELECT * FROM users")
-    SW->>SW: Start Timer
-    SW->>DB: Forward Query
-    DB-->>SW: Return Results
-    SW->>SW: Stop Timer
-    SW->>Log: Log Query Stats
-    SW-->>App: Return Results
+### Architecture
+![SQLWatchdog Architecture](docs/images/architecture.svg)
 
-    Note over App,Log: Performance Analysis
-    App->>SW: RenderReport()
-    SW->>Log: Fetch Query Stats
-    Log-->>SW: Return Stats
-    SW-->>App: HTML Report
-```
-
-## Architecture
-
-```mermaid
-graph TD
-    A[Classic ASP App] -->|1. Creates| B[ADODB Connection]
-    B -->|2. Wraps| C[SQLWatchdog Proxy]
-    C -->|3. Delegates| B
-    C -->|4. Monitors| D[Query Logs]
-    D -->|5. Analyzes| E[Performance Reports]
-    
-    style C fill:#f9f,stroke:#333,stroke-width:2px
-    style D fill:#bbf,stroke:#333,stroke-width:2px
-```
+The architecture diagram illustrates:
+1. SQLWatchdog acts as a proxy between your app and database
+2. Original connection is preserved and delegated to
+3. All queries are monitored and timed
+4. Performance data is collected and analyzed
+5. Reports are generated on demand
 
 ## Features
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="400">
+  <style>
+    text { font-family: -apple-system, system-ui, sans-serif; }
+    .title { font-size: 14px; font-weight: bold; }
+    .label { font-size: 12px; }
+    .arrow { stroke: #666; stroke-width: 2; marker-end: url(#arrow); }
+    .box { fill: white; stroke: #333; stroke-width: 2; }
+    .highlight { fill: #f0f0f0; }
+  </style>
+  
+  <!-- Components -->
+  <rect x="50" y="50" width="150" height="60" class="box" />
+  <text x="125" y="85" text-anchor="middle" class="title">Classic ASP App</text>
+  
+  <rect x="300" y="50" width="150" height="60" class="box highlight" />
+  <text x="375" y="85" text-anchor="middle" class="title">SQLWatchdog</text>
+  
+  <rect x="550" y="50" width="150" height="60" class="box" />
+  <text x="625" y="85" text-anchor="middle" class="title">Database</text>
+  
+  <!-- Arrows -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L9,3 z" fill="#666" />
+    </marker>
+  </defs>
+  
+  <!-- Flow -->
+  <path d="M200,80 L300,80" class="arrow" />
+  <text x="250" y="70" class="label">1. Query</text>
+  
+  <path d="M450,80 L550,80" class="arrow" />
+  <text x="500" y="70" class="label">2. Monitor</text>
+  
+  <!-- Process -->
+  <rect x="300" y="150" width="150" height="120" class="box highlight" />
+  <text x="375" y="175" text-anchor="middle" class="title">Process</text>
+  <text x="375" y="200" text-anchor="middle" class="label">• Time tracking</text>
+  <text x="375" y="220" text-anchor="middle" class="label">• Query analysis</text>
+  <text x="375" y="240" text-anchor="middle" class="label">• Performance logs</text>
+</svg>
