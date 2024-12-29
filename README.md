@@ -2,36 +2,28 @@
 
 A lightweight SQL query performance monitoring and profiling tool designed specifically for Classic ASP applications. SQLWatchdog helps developers identify slow queries, monitor SQL performance, and optimize database operations with minimal setup and overhead.
 
-## How It Works
-
-### Workflow
-![SQLWatchdog Workflow](docs/images/workflow.svg)
-
-The diagram above shows how SQLWatchdog intercepts and monitors database operations:
-1. Your ASP application sends a query
-2. SQLWatchdog intercepts and starts timing
-3. Query is forwarded to the database
-4. Results are captured and analyzed
-5. Performance metrics are logged
-
-### Architecture
-![SQLWatchdog Architecture](docs/images/architecture.svg)
-
-The architecture diagram illustrates:
-1. SQLWatchdog acts as a proxy between your app and database
-2. Original connection is preserved and delegated to
-3. All queries are monitored and timed
-4. Performance data is collected and analyzed
-5. Reports are generated on demand
-
 ## Features
 
 - 🔍 **Zero-Configuration Monitoring**: Simply wrap your existing connection with SQLWatchdog
 - ⚡ **Performance Tracking**: Automatically tracks query execution times
-- 🎯 **Slow Query Detection**: Configurable threshold for identifying slow queries
-- 📊 **Query Analysis**: Detailed reports on query types and execution times
+- 🎯 **Slow Query Detection**: Configurable threshold for identifying slow queries (default: 500ms)
+- 📊 **Query Analysis**: Detailed reports on query types (SELECT, INSERT, UPDATE, DELETE)
 - 🛡️ **Safe Connection Handling**: Proper connection lifecycle management
 - 🔄 **Transaction Support**: Full support for database transactions
+- 📝 **Query Logging**: Comprehensive logging of all SQL operations
+- 🎨 **Built-in HTML Reports**: Beautiful, styled performance reports
+- ⚠️ **Error Handling**: Detailed SQL error capturing and reporting
+- 🔒 **Parameter Safety**: Automatic parameter type detection and safe handling
+
+### Sample Performance Report
+![SQLWatchdog Performance Report](docs/screenshots/sample-report.webp)
+
+The built-in performance report shows:
+- Query content with syntax highlighting
+- Query type (SELECT, INSERT, etc.)
+- Execution duration in seconds
+- Status indicators (SLOW/OK)
+- Highlighted slow queries for easy identification
 
 ## Quick Start
 
@@ -60,26 +52,27 @@ Set rs = Conn.Execute("SELECT * FROM users")
 ' ... use recordset as normal ...
 ```
 
-## Core Concepts
+## How It Works
 
-### Proxy Pattern Implementation
+### Workflow
+![SQLWatchdog Workflow](docs/images/workflow.svg)
 
-SQLWatchdog uses the Proxy design pattern to intercept and monitor database operations without requiring changes to your existing code. Here's how it works:
+The diagram above shows how SQLWatchdog intercepts and monitors database operations:
+1. Your ASP application sends a query
+2. SQLWatchdog intercepts and starts timing
+3. Query is forwarded to the database
+4. Results are captured and analyzed
+5. Performance metrics are logged
 
-1. **Connection Wrapping**: 
-   - Original connection is stored safely in the proxy
-   - All operations are delegated to the original connection
-   - Performance metrics are collected during delegation
+### Architecture
+![SQLWatchdog Architecture](docs/images/architecture.svg)
 
-2. **Reference Management**:
-   - Original connection reference is preserved
-   - Proxy maintains its own state without affecting original connection
-   - Proper cleanup on termination
-
-3. **Query Monitoring**:
-   - Each query execution is timed
-   - Query type is analyzed (SELECT, INSERT, UPDATE, DELETE)
-   - Performance metrics are stored in memory
+The architecture diagram illustrates:
+1. SQLWatchdog acts as a proxy between your app and database
+2. Original connection is preserved and delegated to
+3. All queries are monitored and timed
+4. Performance data is collected and analyzed
+5. Reports are generated on demand
 
 ## API Reference
 
@@ -109,6 +102,41 @@ Executes a parameterized query safely.
 Set rs = Conn.ExecuteParams("SELECT * FROM users WHERE id = ?", Array(userId))
 ```
 
+### Helper Methods
+
+#### `GetQueryType(sqlQuery)`
+Internally determines the type of SQL query:
+- SELECT
+- INSERT
+- UPDATE
+- DELETE
+- OTHER
+
+#### `GetParamType(value)`
+Automatically detects parameter types:
+- Integer (vbInteger, vbLong)
+- Double (vbSingle, vbDouble)
+- Date (vbDate)
+- String (vbString)
+- Boolean (vbBoolean)
+- Default: VarChar
+
+### Connection Methods
+
+#### `State`
+Get the current connection state.
+```asp
+If Conn.State = 1 Then ' adStateOpen
+    ' Connection is open
+End If
+```
+
+#### `Close()`
+Safely closes the database connection.
+```asp
+Conn.Close
+```
+
 ### Transaction Methods
 
 - `BeginTrans()`: Starts a transaction
@@ -135,6 +163,94 @@ Conn.ClearLogs()
 Generates an HTML report of query performance.
 ```asp
 Response.Write Conn.RenderReport(True)  ' Show all queries
+```
+
+### HTML Report Styling
+
+The `RenderReport` method includes built-in CSS styling:
+- Clean table layout
+- Highlighted slow queries
+- Color-coded status indicators
+- Responsive design
+- Modern typography
+
+Example Report Columns:
+- Query content (HTML encoded for safety)
+- Query type
+- Duration (in seconds)
+- Status (SLOW/OK)
+
+## Testing & Examples
+
+The `example` directory contains everything you need to test SQLWatchdog:
+
+### 1. Configure Database Connection
+Edit `example/db.asp` with your database settings:
+```asp
+Const DBdriver = "MySQL ODBC 3.51 Driver"
+Dim DBname : DBname     = "demo_test_db"
+Dim DBuser : DBuser     = "demo_test_user"
+Dim DBpass : DBpass     = "your_password"
+Dim DBserver : DBserver = "localhost"
+Dim DBPort : DBPort     = "3306"
+```
+
+### 2. Create Test Database
+Run `example/createtestdb.asp` to set up the test environment:
+- Creates test database if not exists
+- Sets up `users` and `orders` tables
+- Populates tables with sample data
+
+Tables Created:
+- `users` (id, username, email, created_at, status)
+- `orders` (id, user_id, total, order_date, status)
+
+### 3. Run Example Queries
+Access `example/usage.asp` to see SQLWatchdog in action:
+1. Simple SELECT query
+2. Slow query with JOIN (using SLEEP)
+3. Parameterized query
+4. Transaction handling
+5. Performance report generation
+
+### Example Files
+```
+example/
+├── createtestdb.asp  # Database setup script
+├── db.asp           # Database connection settings
+├── style.css        # Modern styling for examples
+└── usage.asp        # Usage demonstrations
+```
+
+### Testing Different Scenarios
+
+1. **Monitor Query Performance**
+```asp
+' Set custom threshold
+Conn.SetThreshold 0.3  ' 300ms
+
+' Execute some queries
+Set rs = Conn.Execute("SELECT * FROM users")
+```
+
+2. **Test Transaction Handling**
+```asp
+Conn.BeginTrans
+' ... perform multiple operations ...
+If success Then
+    Conn.CommitTrans
+Else
+    Conn.RollbackTrans
+End If
+```
+
+3. **View Performance Report**
+```asp
+' Show all queries including fast ones
+Response.Write Conn.RenderReport(True)
+
+' Show only slow queries
+Response.Write Conn.RenderReport(False)
 ```
 
 ## Best Practices
@@ -167,6 +283,26 @@ If rs Is Nothing Then
     Response.Write "<p class='error'>" & Conn.GetLastError() & "</p>"
 End If
 ```
+
+## Installation
+
+1. Download the latest release from GitHub
+2. Copy `sqlwatchdog.asp` to your project directory
+3. Include it in your ASP pages where needed
+
+## Requirements
+
+- Classic ASP environment
+- ADODB.Connection support
+- Basic error handling capabilities
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
 ## License
 
